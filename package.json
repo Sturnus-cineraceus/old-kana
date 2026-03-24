@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "cheerio": "^1.2.0",
+    "node-fetch": "^3.3.2",
     "vite": "^5.0.0"
   }
 }
