@@ -1,5 +1,5 @@
 async function loadMapper() {
-  const res = await fetch('/src/mapper.json', { cache: 'no-store' });
+  const res = await fetch('./mapper.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('mapper.json を読み込めませんでした');
   // 配列を維持して返す（変換時に毎回ランダム選択する）
   return await res.json();
