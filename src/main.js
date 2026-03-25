@@ -1,6 +1,7 @@
 async function loadMapper() {
   const res = await fetch('/src/mapper.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('mapper.json を読み込めませんでした');
+  // 配列を維持して返す（変換時に毎回ランダム選択する）
   return await res.json();
 }
 
@@ -18,42 +19,26 @@ function setupUI(mapper) {
   const inputEl = document.getElementById('input');
   const outputEl = document.getElementById('output');
   const convertBtn = document.getElementById('convert');
-  const copyBtn = document.getElementById('copy');
-  const downloadBtn = document.getElementById('download');
 
   const regex = buildRegex(Object.keys(mapper));
 
   function convertText(text) {
-    return text.replace(regex, (m) => mapper[m] ?? m);
+    return text.replace(regex, (m) => {
+      const v = mapper[m];
+      if (Array.isArray(v) && v.length > 0) {
+        const pick = v[Math.floor(Math.random() * v.length)];
+        return String.fromCodePoint(parseInt(pick.replace(/^U\+/i, ''), 16));
+      } else if (typeof v === 'string') {
+        return v;
+      }
+      return m;
+    });
   }
 
   convertBtn.addEventListener('click', () => {
     const src = inputEl.value;
     const converted = convertText(src);
     outputEl.value = converted;
-  });
-
-  copyBtn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(outputEl.value);
-      copyBtn.textContent = 'コピーしました';
-      setTimeout(() => (copyBtn.textContent = 'コピー'), 1200);
-    } catch {
-      copyBtn.textContent = 'コピー失敗';
-      setTimeout(() => (copyBtn.textContent = 'コピー'), 1200);
-    }
-  });
-
-  downloadBtn.addEventListener('click', () => {
-    const blob = new Blob([outputEl.value], { type: 'text/plain; charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'converted.txt';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   });
 }
 
