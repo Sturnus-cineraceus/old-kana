@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && copy src\\mapper.json docs\\mapper.json",
     "preview": "vite preview"
   },
   "devDependencies": {
